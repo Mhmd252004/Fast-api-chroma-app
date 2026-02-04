@@ -5,11 +5,8 @@ import os
 
 app = FastAPI(title="FastAPI + ChromaDB API")
 
-# This will be "chroma_db" locally
-# and "/app/chroma_db" on Railway
-PERSIST_DIR = os.getenv("CHROMA_DIR", "chroma_db")
-
-# THIS LINE CREATES THE FOLDER IF IT DOESN'T EXIST
+# Render persistent disk path
+PERSIST_DIR = os.getenv("CHROMA_DIR", "/opt/render/project/chroma_db")
 os.makedirs(PERSIST_DIR, exist_ok=True)
 
 client = chromadb.Client(
