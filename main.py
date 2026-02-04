@@ -5,22 +5,16 @@ import os
 
 app = FastAPI(title="FastAPI + ChromaDB API")
 
-# Render persistent disk path
-PERSIST_DIR = os.getenv("CHROMA_DIR", "/opt/render/project/chroma_db")
+# في Vercel، المسار الوحيد المتاح للكتابة هو /tmp
+PERSIST_DIR = "/tmp/chroma_db"
 os.makedirs(PERSIST_DIR, exist_ok=True)
 
-client = chromadb.Client(
-    Settings(
-        persist_directory=PERSIST_DIR,
-        anonymized_telemetry=False
-    )
-)
-
+client = chromadb.PersistentClient(path=PERSIST_DIR)
 collection = client.get_or_create_collection("my_collection")
 
 @app.get("/")
 def root():
-    return {"status": "API is running"}
+    return {"status": "API is running on Vercel"}
 
 @app.post("/add")
 def add_text(text: str):
@@ -28,8 +22,8 @@ def add_text(text: str):
         documents=[text],
         ids=[str(collection.count() + 1)]
     )
-    client.persist()
-    return {"message": "Text added"}
+    # ملاحظة: في النسخ الحديثة من Chroma، الحفظ يتم تلقائيًا في PersistentClient
+    return {"message": f"Text added to /tmp"}
 
 @app.get("/count")
 def count():
